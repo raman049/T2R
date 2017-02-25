@@ -11,6 +11,7 @@ import GameplayKit
 struct PhysicsCategory {
     static let boat1Image : UInt32 = 0x1 << 1
     static let finishLine : UInt32 = 0x1 << 2
+    static let float : UInt32 = 0x1 << 3
 }
 
 class GameScene2: SKScene {
@@ -20,6 +21,7 @@ class GameScene2: SKScene {
     var paddleImage1 = SKSpriteNode()
     var boat1Image = SKSpriteNode()
     var finishLine = SKSpriteNode()
+    var float1 = SKSpriteNode()
     var started = Bool()
     var gameStarted = Bool()
     var gameOver = Bool()
@@ -28,6 +30,7 @@ class GameScene2: SKScene {
 
     override func didMove(to view: SKView) {
 
+        self.physicsWorld.gravity = CGVector( dx: 0.0, dy: -0.02 )
         //red background
         backgroundColor = UIColor.init(red: 0, green: 1, blue: 1, alpha: 1.0)
         //add sea image
@@ -87,6 +90,11 @@ class GameScene2: SKScene {
         {        timer.invalidate()
             countNum.text = "Start"
             gameStarted = true
+            //ADD FINISH LINE
+            addFinishLine()
+            //ADD FLOAT1
+            addFloat1()
+            boat1Image.physicsBody?.affectedByGravity = true
         }
         self.view?.addSubview(countNum)
     }
@@ -111,8 +119,9 @@ class GameScene2: SKScene {
            // rightButton.setImage(replayImage, for: .normal)
             rightButton.addTarget(self, action: #selector(GameScene2.br), for: .touchUpInside)
             self.view?.addSubview(rightButton)
-        //ADD FINISH LINE
-            addFinishLine()
+
+           //addtimer
+           Timer.scheduledTimer(timeInterval: 1.0, target:self, selector:#selector(GameScene2.startClock),userInfo:nil, repeats: true);
 
         }
     }
@@ -122,18 +131,18 @@ class GameScene2: SKScene {
 
      func bl()
      {
-        print("left")
+       // print("left")
         boat1Image.texture = SKTexture(imageNamed:"boatLeft")
         boat1Image.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
-        boat1Image.physicsBody?.applyImpulse(CGVector(dx: -5, dy: 10))
+        boat1Image.physicsBody?.applyImpulse(CGVector(dx: -25, dy: 15))
        timer2 =  Timer.scheduledTimer(timeInterval: 0.2, target: self, selector: #selector(GameScene2.changePic), userInfo: nil, repeats: false)
     }
     func br()
     {
-        print("right")
+       // print("right")
         boat1Image.texture = SKTexture(imageNamed:"boatRight")
         boat1Image.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
-        boat1Image.physicsBody?.applyImpulse(CGVector(dx: 5, dy: 10))
+        boat1Image.physicsBody?.applyImpulse(CGVector(dx: 25, dy: 15))
       timer3 =   Timer.scheduledTimer(timeInterval: 0.2, target: self, selector: #selector(GameScene2.changePic), userInfo: nil, repeats: false)
     }
     func changePic(){
@@ -147,11 +156,47 @@ class GameScene2: SKScene {
         let finishLineSz = CGSize(width: self.size.width, height: self.size.height/20)
         finishLine.physicsBody = SKPhysicsBody(rectangleOf: finishLineSz)
         finishLine.physicsBody?.isDynamic = true
-        finishLine.physicsBody?.affectedByGravity = false
+        finishLine.physicsBody?.affectedByGravity = true
         finishLine.scale(to: finishLineSz)
         finishLine.zPosition = 6
         finishLine.position = CGPoint(x: 100, y: self.size.height - 5 )
         self.addChild(finishLine)
+    }
+
+    func addFloat1(){
+        float1.removeFromParent()
+        float1 = SKSpriteNode(imageNamed: "float")
+        let float1Sz = CGSize(width: float1.size.width, height: float1.size.height)
+        float1.physicsBody = SKPhysicsBody(rectangleOf: float1Sz)
+        float1.physicsBody?.isDynamic = true
+        float1.physicsBody?.affectedByGravity = true
+        float1.scale(to: float1Sz)
+        float1.zPosition = 6
+        float1.position = CGPoint(x: 100, y: self.size.height - 100 )
+        let action1 = SKAction.rotate(byAngle: 0.005, duration: 0.2)
+        let sequence2 = SKAction.sequence([action1, action1.reversed()])
+        float1.run(SKAction.repeatForever(sequence2))
+        self.addChild(float1)
+    }
+
+  var countDownlabel = UILabel()
+    var secondsLeft = 1000
+    func startClock(){
+        var hours = Int()
+        var minutes = Int()
+        var seconds = Int()
+         secondsLeft = secondsLeft - 1
+        hours = secondsLeft / 3600;
+        minutes = (secondsLeft % 3600) / 60;
+        seconds = (secondsLeft % 3600) % 60;
+        countDownlabel.removeFromSuperview()
+        countDownlabel = UILabel(frame: CGRect(x: 25, y: 25 , width: 150, height: 40))
+        countDownlabel.textAlignment = .center
+        countDownlabel.font = UIFont.init(name: "Optima", size: 20)
+        let stringWithFormat = String(format: "%02d:%02d:%02d", hours, minutes, seconds)
+        countDownlabel.text = stringWithFormat
+        self.view?.addSubview(countDownlabel)
+
     }
 
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
