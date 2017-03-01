@@ -8,6 +8,7 @@
 import SpriteKit
 import GameplayKit
 import GameKit
+import UIKit
 
 struct PhysicsCategory {
     static let boatPC : UInt32 = 0x1 << 1
@@ -25,15 +26,20 @@ class GameScene2: SKScene, SKPhysicsContactDelegate {
     var finishLine = SKSpriteNode()
     var finishLineNode = SKNode()
     var float1 = SKSpriteNode()
+     var float2 = SKSpriteNode()
     var started = Bool()
     var gameStarted = Bool()
     var gameOver = Bool()
     var leftButton = UIButton()
     var rightButton = UIButton()
+    var width = CGFloat()
+    var height = CGFloat()
 
 
     override func didMove(to view: SKView) {
-
+        width = self.size.width
+        height = self.size.height
+        self.physicsWorld.contactDelegate = self
         self.physicsWorld.gravity = CGVector( dx: 0.0, dy: -0.1 )
         //red background
         backgroundColor = UIColor.init(red: 0, green: 1, blue: 1, alpha: 1.0)
@@ -52,7 +58,8 @@ class GameScene2: SKScene, SKPhysicsContactDelegate {
         boatNode = SKNode()
         boat = SKSpriteNode(imageNamed: "boatSteady")
         let boat1ImageSz = CGSize(width: boat.size.width, height: boat.size.height)
-        boat.physicsBody = SKPhysicsBody(rectangleOf: boat1ImageSz)
+        let boat1PhyBodySz = CGSize(width: boat.size.width/5, height: boat.size.height)
+        boat.physicsBody = SKPhysicsBody(rectangleOf: boat1PhyBodySz)
         boat.physicsBody?.isDynamic = true
         boat.physicsBody?.affectedByGravity = false
         boat.physicsBody?.categoryBitMask = PhysicsCategory.boatPC
@@ -98,10 +105,7 @@ class GameScene2: SKScene, SKPhysicsContactDelegate {
             rightButton.frame = (frame: CGRect(x: self.size.width/2 + 1 , y: 0 , width: self.size.width/2 , height: self.size.height))
             rightButton.addTarget(self, action: #selector(GameScene2.boatRight), for: .touchUpInside)
             self.view?.addSubview(rightButton)
-    //TIMER
-            if gameOver == false {
-           Timer.scheduledTimer(timeInterval: 1.0, target:self, selector:#selector(GameScene2.startClock),userInfo:nil, repeats: true);
-            }
+
     //GIVE DIRECTION TO BOAT
             if boatr == true && boatl == true {
                 boatForward()
@@ -111,21 +115,25 @@ class GameScene2: SKScene, SKPhysicsContactDelegate {
                 bLeft()
             }
         }
+        if gameStarted == true && gameOver != true{
+            //TIMER
+            Timer.scheduledTimer(timeInterval: 1.0, target:self, selector:#selector(GameScene2.startClock),userInfo:nil, repeats: false);
+        }
+        if gameOver == true{
+            boat.physicsBody?.affectedByGravity = false
+        }
     }
 
-    func didBegin(_ contact: SKPhysicsContact) {
+     func didBegin(_ contact: SKPhysicsContact) {
 
         let firstBody = contact.bodyA
         let secondBody = contact.bodyB
 
-        if firstBody.collisionBitMask == PhysicsCategory.boatPC && secondBody.categoryBitMask == PhysicsCategory.finishLinePC
+        if firstBody.categoryBitMask == PhysicsCategory.boatPC && secondBody.categoryBitMask == PhysicsCategory.finishLinePC || firstBody.categoryBitMask == PhysicsCategory.finishLinePC && secondBody.categoryBitMask == PhysicsCategory.boatPC
         {
             gameOver = true
             gameOverMethod()
-            print("wtf")
-
         }
-
     }
 
     var countNum = UILabel()
@@ -145,9 +153,9 @@ class GameScene2: SKScene, SKPhysicsContactDelegate {
             timer.invalidate()
             countNum.text = "Start"
             gameStarted = true
-            //ADD FINISH LINE
+        //ADD FINISH LINE
             addFinishLine()
-            //ADD FLOAT1
+        //ADD FLOAT1
             addFloat1()
         }
         self.view?.addSubview(countNum)
@@ -168,7 +176,7 @@ class GameScene2: SKScene, SKPhysicsContactDelegate {
         boat.texture = SKTexture(imageNamed:"boatLeft")
         boat.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
         boat.position = CGPoint(x: boat.position.x - 2 , y: boat.position.y + 3)
-        // boat1?.applyImpulse(CGVector(dx: -25, dy: 15))
+        boat.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 1))
         timer2 = Timer.scheduledTimer(timeInterval: 0.2, target: self, selector: #selector(GameScene2.changePic), userInfo: nil, repeats: false)
         boatl = false
     }
@@ -182,7 +190,7 @@ class GameScene2: SKScene, SKPhysicsContactDelegate {
         boat.texture = SKTexture(imageNamed:"boatRight")
         boat.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
         boat.position = CGPoint(x: boat.position.x + 2 , y: boat.position.y + 3)
-       // boat.applyImpulse(CGVector(dx: 25, dy: 15))
+        boat.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 1))
         timer3 = Timer.scheduledTimer(timeInterval: 0.2, target: self, selector: #selector(GameScene2.changePic), userInfo: nil, repeats: false)
          boatr = false
     }
@@ -191,7 +199,7 @@ class GameScene2: SKScene, SKPhysicsContactDelegate {
          print("forward")
         boat.texture = SKTexture(imageNamed:"boatForward")
         boat.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
-        boat.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 10))
+        boat.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 3))
         boat.position = CGPoint(x: boat.position.x , y: boat.position.y + 5)
                 timer2 = Timer.scheduledTimer(timeInterval: 0.2, target: self, selector: #selector(GameScene2.changePic), userInfo: nil, repeats: false)
         boatr = false
@@ -221,6 +229,7 @@ class GameScene2: SKScene, SKPhysicsContactDelegate {
     }
 
     func addFloat1(){
+        for i in 1...6 {
         float1 = SKSpriteNode(imageNamed: "float")
         let float1Sz = CGSize(width: float1.size.width/3, height: float1.size.height/3)
         float1.physicsBody = SKPhysicsBody(rectangleOf: float1Sz)
@@ -228,12 +237,32 @@ class GameScene2: SKScene, SKPhysicsContactDelegate {
         float1.physicsBody?.affectedByGravity = false
         float1.scale(to: float1Sz)
         float1.zPosition = 6
-        float1.position = CGPoint(x: 100, y: self.size.height - 100 )
+        float1.position = CGPoint(x: 100, y: 100 * i)
         let action1 = SKAction.rotate(byAngle: 0.4, duration: 1)
         let action2 = SKAction.rotate(byAngle: -0.4, duration: 1)
         let sequence2 = SKAction.sequence([action1, action1.reversed(),action2,action2.reversed()])
         float1.run(SKAction.repeatForever(sequence2))
         self.addChild(float1)
+    }
+        addFloat2()
+
+    }
+    func addFloat2(){
+        for j in 1...6 {
+            float2 = SKSpriteNode(imageNamed: "float")
+            let float1Sz = CGSize(width: float2.size.width/3, height: float2.size.height/3)
+            float2.physicsBody = SKPhysicsBody(rectangleOf: float1Sz)
+            float2.physicsBody?.isDynamic = true
+            float2.physicsBody?.affectedByGravity = false
+            float2.scale(to: float1Sz)
+            float2.zPosition = 6
+            float2.position = CGPoint(x: self.size.width - 100, y: CGFloat(100 * j))
+            let action1 = SKAction.rotate(byAngle: 0.4, duration: 1)
+            let action2 = SKAction.rotate(byAngle: -0.4, duration: 1)
+            let sequence2 = SKAction.sequence([action1, action1.reversed(),action2,action2.reversed()])
+            float2.run(SKAction.repeatForever(sequence2))
+            self.addChild(float2)
+        }
     }
 
     var countDownlabel = UILabel()
