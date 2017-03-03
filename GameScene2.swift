@@ -25,8 +25,10 @@ class GameScene2: SKScene, SKPhysicsContactDelegate {
     var boatNode = SKNode()
     var finishLine = SKSpriteNode()
     var finishLineNode = SKNode()
+    var floatNode = SKNode()
     var float1 = SKSpriteNode()
-     var float2 = SKSpriteNode()
+    var float2 = SKSpriteNode()
+    var float3 = SKSpriteNode()
     var started = Bool()
     var gameStarted = Bool()
     var gameOver = Bool()
@@ -37,6 +39,8 @@ class GameScene2: SKScene, SKPhysicsContactDelegate {
 
 
     override func didMove(to view: SKView) {
+      //  view.frame.size = CGSize(width: self.size.width*2, height: self.size.height*2)
+       // view.frame.origin = CGPoint(x:  self.size.width/2, y: -100)
         width = self.size.width
         height = self.size.height
         self.physicsWorld.contactDelegate = self
@@ -57,8 +61,8 @@ class GameScene2: SKScene, SKPhysicsContactDelegate {
         //add boat
         boatNode = SKNode()
         boat = SKSpriteNode(imageNamed: "boatSteady")
-        let boat1ImageSz = CGSize(width: boat.size.width, height: boat.size.height)
-        let boat1PhyBodySz = CGSize(width: boat.size.width/5, height: boat.size.height)
+        let boat1ImageSz = CGSize(width: boat.size.width/2, height: boat.size.height/2)
+        let boat1PhyBodySz = CGSize(width: boat.size.width/5, height: boat.size.height/2)
         boat.physicsBody = SKPhysicsBody(rectangleOf: boat1PhyBodySz)
         boat.physicsBody?.isDynamic = true
         boat.physicsBody?.affectedByGravity = false
@@ -136,6 +140,7 @@ class GameScene2: SKScene, SKPhysicsContactDelegate {
         }
     }
 
+
     var countNum = UILabel()
     var countInt = 0
     var timer = Timer()
@@ -153,6 +158,7 @@ class GameScene2: SKScene, SKPhysicsContactDelegate {
             timer.invalidate()
             countNum.text = "Start"
             gameStarted = true
+            popUp()
         //ADD FINISH LINE
             addFinishLine()
         //ADD FLOAT1
@@ -173,10 +179,11 @@ class GameScene2: SKScene, SKPhysicsContactDelegate {
     func bLeft()
     {
         // print("left")
+        moveFloat()
         boat.texture = SKTexture(imageNamed:"boatLeft")
         boat.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
-        boat.position = CGPoint(x: boat.position.x - 2 , y: boat.position.y + 3)
-        boat.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 1))
+        boat.position = CGPoint(x: boat.position.x - 2 , y: boat.position.y + 1)
+    //    boat.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 1))
         timer2 = Timer.scheduledTimer(timeInterval: 0.2, target: self, selector: #selector(GameScene2.changePic), userInfo: nil, repeats: false)
         boatl = false
     }
@@ -186,21 +193,23 @@ class GameScene2: SKScene, SKPhysicsContactDelegate {
     }
     func bRight()
     {
-        // print("right")
+        moveFloat()
         boat.texture = SKTexture(imageNamed:"boatRight")
         boat.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
-        boat.position = CGPoint(x: boat.position.x + 2 , y: boat.position.y + 3)
-        boat.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 1))
+        boat.position = CGPoint(x: boat.position.x + 2 , y: boat.position.y + 1)
+    //    boat.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 1))
         timer3 = Timer.scheduledTimer(timeInterval: 0.2, target: self, selector: #selector(GameScene2.changePic), userInfo: nil, repeats: false)
          boatr = false
+
     }
     func boatForward()
     {
          print("forward")
+        moveFloat()
         boat.texture = SKTexture(imageNamed:"boatForward")
         boat.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
-        boat.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 3))
-        boat.position = CGPoint(x: boat.position.x , y: boat.position.y + 5)
+       // boat.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 3))
+        boat.position = CGPoint(x: boat.position.x , y: boat.position.y + 2)
                 timer2 = Timer.scheduledTimer(timeInterval: 0.2, target: self, selector: #selector(GameScene2.changePic), userInfo: nil, repeats: false)
         boatr = false
         boatl = false
@@ -222,14 +231,17 @@ class GameScene2: SKScene, SKPhysicsContactDelegate {
         finishLine.physicsBody?.collisionBitMask = PhysicsCategory.boatPC
         finishLine.physicsBody?.contactTestBitMask = PhysicsCategory.boatPC
         finishLine.scale(to: finishLineSz)
-        finishLine.zPosition = 6
+        finishLine.zPosition = 4
         finishLine.position = CGPoint(x: 100, y: self.size.height - 50 )
         finishLineNode.addChild(finishLine)
         self.addChild(finishLineNode)
     }
+    var floatArray = [SKSpriteNode]()
 
     func addFloat1(){
-        for i in 1...6 {
+        for ii in 1...20 {
+        for i in 1...2 {
+        floatNode = SKNode()
         float1 = SKSpriteNode(imageNamed: "float")
         let float1Sz = CGSize(width: float1.size.width/3, height: float1.size.height/3)
         float1.physicsBody = SKPhysicsBody(rectangleOf: float1Sz)
@@ -237,34 +249,23 @@ class GameScene2: SKScene, SKPhysicsContactDelegate {
         float1.physicsBody?.affectedByGravity = false
         float1.scale(to: float1Sz)
         float1.zPosition = 6
-        float1.position = CGPoint(x: 100, y: 100 * i)
+        float1.position = CGPoint(x: 120 * i, y: 100 * ii)
         let action1 = SKAction.rotate(byAngle: 0.4, duration: 1)
         let action2 = SKAction.rotate(byAngle: -0.4, duration: 1)
         let sequence2 = SKAction.sequence([action1, action1.reversed(),action2,action2.reversed()])
         float1.run(SKAction.repeatForever(sequence2))
-        self.addChild(float1)
+        floatArray.append(float1)
+        }
+        }
+        implementAddFloat()
     }
-        addFloat2()
-
-    }
-    func addFloat2(){
-        for j in 1...6 {
-            float2 = SKSpriteNode(imageNamed: "float")
-            let float1Sz = CGSize(width: float2.size.width/3, height: float2.size.height/3)
-            float2.physicsBody = SKPhysicsBody(rectangleOf: float1Sz)
-            float2.physicsBody?.isDynamic = true
-            float2.physicsBody?.affectedByGravity = false
-            float2.scale(to: float1Sz)
-            float2.zPosition = 6
-            float2.position = CGPoint(x: self.size.width - 100, y: CGFloat(100 * j))
-            let action1 = SKAction.rotate(byAngle: 0.4, duration: 1)
-            let action2 = SKAction.rotate(byAngle: -0.4, duration: 1)
-            let sequence2 = SKAction.sequence([action1, action1.reversed(),action2,action2.reversed()])
-            float2.run(SKAction.repeatForever(sequence2))
-            self.addChild(float2)
+    func implementAddFloat(){
+        for float in floatArray{
+            self.addChild(float)
         }
     }
 
+    var copyOfView = UIViewController()
     var countDownlabel = UILabel()
     var secondsLeft = 0
  //START CLOCK
@@ -300,9 +301,54 @@ class GameScene2: SKScene, SKPhysicsContactDelegate {
         print("gameOverMethod")
     }
 
+    var customView = UIView()
+
+    func popUp()
+    {
+        print("popupmethod")
+
+       customView = UIView(frame: CGRect(x: 0, y: 0, width: 200 , height: 200))
+        customView.backgroundColor = UIColor.init(red: 196/255, green: 113/255, blue: 245/255, alpha: 1/255)
+    //    customView.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
+//        customView.frame.size = CGSize(width: 100, height: 100)
+//        customView.frame.origin = CGPoint(x: 100, y: 100)
+  //      addFloat1()
+        //self.view?.addSubview(customView)
+        self.view?.addSubview(customView)
+
+    }
+
+    func moveFloat(){
+        for float in floatArray{
+            float.position = CGPoint(x: float.position.x, y: float.position.y - 2 )
+            float.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
+            float.physicsBody?.applyImpulse(CGVector(dx: 0, dy: -0.02))
+        }
+    }
+
+
+
 }
 
+extension UIView {
+    func copyView() -> AnyObject
+    {
+        return NSKeyedUnarchiver.unarchiveObject(with: NSKeyedArchiver.archivedData(withRootObject: self))! as AnyObject 
+    }
 
+}
+
+extension CGRect {
+    var center: CGPoint {
+        get {
+            return CGPoint(x: origin.x + width / 2, y: origin.y + height / 2)
+        }
+        set {
+            origin.x = newValue.x - width / 2
+            origin.y = newValue.y - height / 2
+        }
+    }
+}
 
 
 
