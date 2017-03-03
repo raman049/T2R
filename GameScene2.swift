@@ -163,6 +163,7 @@ class GameScene2: SKScene, SKPhysicsContactDelegate {
             addFinishLine()
         //ADD FLOAT1
             addFloat1()
+            addStartLine()
         }
         self.view?.addSubview(countNum)
     }
@@ -209,7 +210,7 @@ class GameScene2: SKScene, SKPhysicsContactDelegate {
         boat.texture = SKTexture(imageNamed:"boatForward")
         boat.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
        // boat.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 3))
-        boat.position = CGPoint(x: boat.position.x , y: boat.position.y + 2)
+        boat.position = CGPoint(x: boat.position.x , y: boat.position.y + 3)
                 timer2 = Timer.scheduledTimer(timeInterval: 0.2, target: self, selector: #selector(GameScene2.changePic), userInfo: nil, repeats: false)
         boatr = false
         boatl = false
@@ -218,23 +219,46 @@ class GameScene2: SKScene, SKPhysicsContactDelegate {
     func changePic(){
         boat.texture = SKTexture(imageNamed:"boatSteady")
     }
-
-
+    var label1 = UILabel()
     func addFinishLine(){
         finishLineNode = SKNode()
-        finishLine = SKSpriteNode(imageNamed: "float")
-        let finishLineSz = CGSize(width: self.size.width, height: 5)
-        finishLine.physicsBody = SKPhysicsBody(rectangleOf: finishLineSz)
-        finishLine.physicsBody?.isDynamic = false
+        let fihishLineSz = CGSize(width: Int(self.size.width), height: 10)
+
+        finishLine.physicsBody = SKPhysicsBody(rectangleOf: fihishLineSz)
+        finishLine.position = CGPoint(x: self.size.width/2, y: self.size.height - 20)
+        finishLine.physicsBody?.isDynamic = true
         finishLine.physicsBody?.affectedByGravity = false
         finishLine.physicsBody?.categoryBitMask = PhysicsCategory.finishLinePC
         finishLine.physicsBody?.collisionBitMask = PhysicsCategory.boatPC
         finishLine.physicsBody?.contactTestBitMask = PhysicsCategory.boatPC
-        finishLine.scale(to: finishLineSz)
-        finishLine.zPosition = 4
-        finishLine.position = CGPoint(x: 100, y: self.size.height - 50 )
         finishLineNode.addChild(finishLine)
-        self.addChild(finishLineNode)
+
+//        let lapLine = SKLabelNode(fontNamed: "Optima")
+//        lapLine.text = "250 meters"
+//        lapLine.fontSize = 10
+//        lapLine.fontColor = SKColor.yellow
+//        lapLine.position = CGPoint(x:self.size.width/2, y: 5)
+//        self.addChild(lapLine)
+        label1 = UILabel(frame: CGRect(x: 0, y: 20, width: frame.size.width, height: 10))
+        label1.text = "250 meters"
+        label1.backgroundColor = UIColor(displayP3Red: 0.1, green: 0.1, blue: 0.1, alpha: 0.5)
+        label1.textAlignment = .center
+       // label1.center = CGPoint(x: self.size.width/2, y: self.size.height - 20)
+        label1.textColor = UIColor.yellow
+        label1.font = UIFont.init(name: "Optima", size: 10)
+        self.view?.addSubview(label1)
+         self.addChild(finishLineNode)
+    }
+    var startLineNode = SKNode()
+    var startLine = SKSpriteNode()
+    func addStartLine(){
+        let startLineSz = CGSize(width: Int(self.size.width), height: 20)
+        startLine.physicsBody = SKPhysicsBody(rectangleOf: startLineSz)
+        startLine.position = CGPoint(x:self.size.width/2, y: 5)
+        startLine.physicsBody?.isDynamic = false
+        startLine.color = UIColor(displayP3Red: 0, green: 0.5, blue: 0.3, alpha: 0.5)
+        startLineNode.addChild(startLine)
+        self.addChild(startLineNode)
     }
     var floatArray = [SKSpriteNode]()
 
@@ -246,6 +270,7 @@ class GameScene2: SKScene, SKPhysicsContactDelegate {
         let float1Sz = CGSize(width: float1.size.width/3, height: float1.size.height/3)
         float1.physicsBody = SKPhysicsBody(rectangleOf: float1Sz)
         float1.physicsBody?.isDynamic = true
+        float1.physicsBody?.collisionBitMask = 0
         float1.physicsBody?.affectedByGravity = false
         float1.scale(to: float1Sz)
         float1.zPosition = 6
@@ -322,32 +347,17 @@ class GameScene2: SKScene, SKPhysicsContactDelegate {
         for float in floatArray{
             float.position = CGPoint(x: float.position.x, y: float.position.y - 2 )
             float.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
-            float.physicsBody?.applyImpulse(CGVector(dx: 0, dy: -0.02))
+            float.physicsBody?.applyImpulse(CGVector(dx: 0, dy: -0.04))
         }
+        finishLine.position = CGPoint(x: finishLine.position.x, y: finishLine.position.y - 2 )
+        finishLine.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
+        finishLine.physicsBody?.applyImpulse(CGVector(dx: 0, dy: -0.04))
+        label1.center = CGPoint(x: frame.size.width/2, y: label1.frame.origin.y - 2 )
+
     }
 
 
 
-}
-
-extension UIView {
-    func copyView() -> AnyObject
-    {
-        return NSKeyedUnarchiver.unarchiveObject(with: NSKeyedArchiver.archivedData(withRootObject: self))! as AnyObject 
-    }
-
-}
-
-extension CGRect {
-    var center: CGPoint {
-        get {
-            return CGPoint(x: origin.x + width / 2, y: origin.y + height / 2)
-        }
-        set {
-            origin.x = newValue.x - width / 2
-            origin.y = newValue.y - height / 2
-        }
-    }
 }
 
 
