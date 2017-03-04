@@ -1,4 +1,4 @@
-\//
+//
 //  GameScene2.swift
 //  T2R
 //
@@ -39,12 +39,15 @@ class GameScene2: SKScene, SKPhysicsContactDelegate {
 
 
     override func didMove(to view: SKView) {
-      //  view.frame.size = CGSize(width: self.size.width*2, height: self.size.height*2)
-       // view.frame.origin = CGPoint(x:  self.size.width/2, y: -100)
+        getItTogether()
+    }
+    func getItTogether(){
+        //  view.frame.size = CGSize(width: self.size.width*2, height: self.size.height*2)
+        // view.frame.origin = CGPoint(x:  self.size.width/2, y: -100)
         width = self.size.width
         height = self.size.height
         self.physicsWorld.contactDelegate = self
-        self.physicsWorld.gravity = CGVector( dx: 0.0, dy: -0.05 )
+        self.physicsWorld.gravity = CGVector( dx: 0.0, dy: -0.06 )
         //red background
         backgroundColor = UIColor.init(red: 0, green: 1, blue: 1, alpha: 1.0)
         //add sea image
@@ -61,8 +64,8 @@ class GameScene2: SKScene, SKPhysicsContactDelegate {
         //add boat
         boatNode = SKNode()
         boat = SKSpriteNode(imageNamed: "boatSteady")
-        let boat1ImageSz = CGSize(width: boat.size.width/2, height: boat.size.height/2)
-        let boat1PhyBodySz = CGSize(width: boat.size.width/5, height: boat.size.height/2)
+        let boat1ImageSz = CGSize(width: boat.size.width/4, height: boat.size.height/4)
+        let boat1PhyBodySz = CGSize(width: boat.size.width/6, height: boat.size.height/3)
         boat.physicsBody = SKPhysicsBody(rectangleOf: boat1PhyBodySz)
         boat.physicsBody?.isDynamic = true
         boat.physicsBody?.affectedByGravity = false
@@ -92,7 +95,6 @@ class GameScene2: SKScene, SKPhysicsContactDelegate {
         right.font = UIFont.init(name: "Optima", size: 25)
         right.text = "Tap \n here \n 2 \n row \n right"
         self.view?.addSubview(right)
-
     }
     override func update(_ currentTime: CFTimeInterval) {
         if gameStarted == true{
@@ -181,11 +183,11 @@ class GameScene2: SKScene, SKPhysicsContactDelegate {
     func bLeft()
     {
         // print("left")
-        moveFloat()
+        moveFloatRight()
         boat.texture = SKTexture(imageNamed:"boatLeft")
         boat.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
-        boat.position = CGPoint(x: boat.position.x - 2 , y: boat.position.y + 1)
-    //    boat.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 1))
+       // boat.position = CGPoint(x: boat.position.x - 2 , y: boat.position.y + 1)
+        boat.physicsBody?.applyImpulse(CGVector(dx: -0.05, dy: 0.05))
         timer2 = Timer.scheduledTimer(timeInterval: 0.2, target: self, selector: #selector(GameScene2.changePic), userInfo: nil, repeats: false)
         boatl = false
     }
@@ -195,11 +197,11 @@ class GameScene2: SKScene, SKPhysicsContactDelegate {
     }
     func bRight()
     {
-        moveFloat()
+        moveFloatLeft()
         boat.texture = SKTexture(imageNamed:"boatRight")
         boat.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
-        boat.position = CGPoint(x: boat.position.x + 2 , y: boat.position.y + 1)
-    //    boat.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 1))
+       // boat.position = CGPoint(x: boat.position.x + 2 , y: boat.position.y + 1)
+        boat.physicsBody?.applyImpulse(CGVector(dx: 0.05, dy: 0.05))
         timer3 = Timer.scheduledTimer(timeInterval: 0.2, target: self, selector: #selector(GameScene2.changePic), userInfo: nil, repeats: false)
          boatr = false
 
@@ -210,7 +212,7 @@ class GameScene2: SKScene, SKPhysicsContactDelegate {
         moveFloat()
         boat.texture = SKTexture(imageNamed:"boatForward")
         boat.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
-       // boat.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 3))
+        boat.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 0.05))
         boat.position = CGPoint(x: boat.position.x , y: boat.position.y + 3)
                 timer2 = Timer.scheduledTimer(timeInterval: 0.2, target: self, selector: #selector(GameScene2.changePic), userInfo: nil, repeats: false)
         boatr = false
@@ -238,14 +240,6 @@ class GameScene2: SKScene, SKPhysicsContactDelegate {
         finishLineNode.addChild(finishLine)
         self.addChild(finishLineNode)
 
-//        let lapLine = SKLabelNode(text: "Optima")
-//       // lapLine.text = "250 meters"
-//        lapLine.fontSize = 10
-//        lapLine.fontColor = SKColor.yellow
-//        lapLine.position = CGPoint(x:self.size.width/2, y: 5)
-//        lapLine.physicsBody = SKPhysicsBody(rectangleOf: fihishLineSz)
-//        finishLineNode.addChild(lapLine)
-//        self.addChild(finishLineNode)
         label1 = UILabel(frame: CGRect(x: 0, y: 20, width: self.size.width, height: 10))
         label1.text = "250 meters"
         label1.backgroundColor = UIColor(displayP3Red: 0.1, green: 0.1, blue: 0.1, alpha: 0.5)
@@ -278,7 +272,7 @@ class GameScene2: SKScene, SKPhysicsContactDelegate {
         for i in 1...2 {
         floatNode = SKNode()
         float1 = SKSpriteNode(imageNamed: "float")
-        let float1Sz = CGSize(width: float1.size.width/3, height: float1.size.height/3)
+        let float1Sz = CGSize(width: float1.size.width/5, height: float1.size.height/5)
         float1.physicsBody = SKPhysicsBody(rectangleOf: float1Sz)
         float1.physicsBody?.isDynamic = true
         float1.physicsBody?.collisionBitMask = 0
@@ -333,8 +327,21 @@ class GameScene2: SKScene, SKPhysicsContactDelegate {
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         boat.texture = SKTexture(imageNamed:"boatSteady")
     }
+        var timing = UILabel()
     func gameOverMethod(){
         print("gameOverMethod")
+        gameStarted = false
+        let completedTime = countDownlabel.text
+        timing = UILabel(frame: CGRect(x: self.size.width/2 - 150, y: self.size.height/2, width: 300, height: 100))
+        timing.backgroundColor = UIColor(displayP3Red: 0.1, green: 0.1, blue: 0.1, alpha: 0.5)
+        timing.textAlignment = .center
+        timing.numberOfLines = 0
+        // timing.center = CGPoint(x: self.size.width/2, y: self.size.height - 20)
+        timing.textColor = UIColor.white
+        timing.font = UIFont.init(name: "Optima", size: 20)
+        timing.text = "Your Complete Time \n \(completedTime!)"
+        self.view?.addSubview(timing)
+        addReplay()
     }
 
     var customView = UIView()
@@ -365,11 +372,65 @@ class GameScene2: SKScene, SKPhysicsContactDelegate {
         finishLine.position = CGPoint(x: finishLine.position.x, y: finishLine.position.y - 2 )
         finishLine.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
         finishLine.physicsBody?.applyImpulse(CGVector(dx: 0, dy: -0.04))
-        label1.center = CGPoint(x: frame.size.width/2, y: label1.frame.origin.y + 2 )
+        label1.frame = CGRect(x: 0, y: label1.frame.origin.y + 2, width: self.size.width, height: 10)
 
     }
 
+    func moveFloatRight(){
+        for float in floatArray{
+            let move1 = SKAction.move(by: (CGVector(dx: +1 , dy:-5)), duration: 0.2)
+            float.run(move1)
+            //            float.position = CGPoint(x: float.position.x, y: float.position.y - 1 )
+            float.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
+            float.physicsBody?.applyImpulse(CGVector(dx: 0.03, dy: -0.03))
+        }
+        finishLine.position = CGPoint(x: finishLine.position.x, y: finishLine.position.y - 2 )
+        finishLine.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
+        finishLine.physicsBody?.applyImpulse(CGVector(dx: 0, dy: -0.04))
+        label1.frame = CGRect(x: 0, y: label1.frame.origin.y + 2, width: self.size.width, height: 10)
+        
+    }
+    func moveFloatLeft(){
+        for float in floatArray{
+            let move1 = SKAction.move(by: (CGVector(dx: -1 , dy:-5)), duration: 0.2)
+            float.run(move1)
+            //            float.position = CGPoint(x: float.position.x, y: float.position.y - 1 )
+            float.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
+            float.physicsBody?.applyImpulse(CGVector(dx: -0.03, dy: -0.03))
+        }
+        finishLine.position = CGPoint(x: finishLine.position.x, y: finishLine.position.y - 2 )
+        finishLine.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
+        finishLine.physicsBody?.applyImpulse(CGVector(dx: 0, dy: -0.04))
+        label1.frame = CGRect(x: 0, y: label1.frame.origin.y + 2, width: self.size.width, height: 10)
 
+    }
+    var replay = UIButton()
+    func addReplay(){
+        //add Replay button
+        rightButton.removeFromSuperview()
+        let replayImage = UIImage(named: "replay") as UIImage?
+        replay = UIButton(type: UIButtonType.custom) as UIButton
+        replay.frame = (frame: CGRect(x: self.size.width - 20 - (replayImage?.size.width)!/3 , y: self.size.height - 10 - (replayImage?.size.height)!/3, width: (replayImage?.size.width)!/3, height: (replayImage?.size.height)!/3))
+        replay.setImage(replayImage, for: .normal)
+        replay.addTarget(self, action: #selector(GameScene2.restartMethod), for: .touchUpInside)
+        self.view?.addSubview(replay)
+        print("addReplay")
+    }
+
+    func restartMethod(){
+        print("restartme")
+        self.removeAllChildren()
+        self.removeAllActions()
+        self.removeFromParent()
+        rightButton.removeFromSuperview()
+        timing.removeFromSuperview()
+        gameOver = false
+        started = false
+        gameStarted = true
+        getItTogether()
+
+
+    }
 
 }
 
