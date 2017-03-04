@@ -1,4 +1,4 @@
-//
+\//
 //  GameScene2.swift
 //  T2R
 //
@@ -44,7 +44,7 @@ class GameScene2: SKScene, SKPhysicsContactDelegate {
         width = self.size.width
         height = self.size.height
         self.physicsWorld.contactDelegate = self
-        self.physicsWorld.gravity = CGVector( dx: 0.0, dy: -0.1 )
+        self.physicsWorld.gravity = CGVector( dx: 0.0, dy: -0.05 )
         //red background
         backgroundColor = UIColor.init(red: 0, green: 1, blue: 1, alpha: 1.0)
         //add sea image
@@ -66,8 +66,9 @@ class GameScene2: SKScene, SKPhysicsContactDelegate {
         boat.physicsBody = SKPhysicsBody(rectangleOf: boat1PhyBodySz)
         boat.physicsBody?.isDynamic = true
         boat.physicsBody?.affectedByGravity = false
+        boat.physicsBody?.allowsRotation = false
         boat.physicsBody?.categoryBitMask = PhysicsCategory.boatPC
-        boat.physicsBody?.collisionBitMask = PhysicsCategory.finishLinePC
+        boat.physicsBody?.collisionBitMask = 0
         boat.physicsBody?.contactTestBitMask = PhysicsCategory.finishLinePC
         boat.scale(to: boat1ImageSz)
         boat.zPosition = 5
@@ -223,23 +224,29 @@ class GameScene2: SKScene, SKPhysicsContactDelegate {
     func addFinishLine(){
         finishLineNode = SKNode()
         let fihishLineSz = CGSize(width: Int(self.size.width), height: 10)
-
+        finishLine = SKSpriteNode(color: UIColor.init(red: 0.01, green: 0.8, blue: 0.0, alpha: 0.9), size: fihishLineSz)
         finishLine.physicsBody = SKPhysicsBody(rectangleOf: fihishLineSz)
         finishLine.position = CGPoint(x: self.size.width/2, y: self.size.height - 20)
         finishLine.physicsBody?.isDynamic = true
         finishLine.physicsBody?.affectedByGravity = false
         finishLine.physicsBody?.categoryBitMask = PhysicsCategory.finishLinePC
-        finishLine.physicsBody?.collisionBitMask = PhysicsCategory.boatPC
+        finishLine.physicsBody?.collisionBitMask = 0
         finishLine.physicsBody?.contactTestBitMask = PhysicsCategory.boatPC
+        finishLine.color = .red
+        finishLine.alpha = 0.5
+        finishLine.zPosition = 4
         finishLineNode.addChild(finishLine)
+        self.addChild(finishLineNode)
 
-//        let lapLine = SKLabelNode(fontNamed: "Optima")
-//        lapLine.text = "250 meters"
+//        let lapLine = SKLabelNode(text: "Optima")
+//       // lapLine.text = "250 meters"
 //        lapLine.fontSize = 10
 //        lapLine.fontColor = SKColor.yellow
 //        lapLine.position = CGPoint(x:self.size.width/2, y: 5)
-//        self.addChild(lapLine)
-        label1 = UILabel(frame: CGRect(x: 0, y: 20, width: frame.size.width, height: 10))
+//        lapLine.physicsBody = SKPhysicsBody(rectangleOf: fihishLineSz)
+//        finishLineNode.addChild(lapLine)
+//        self.addChild(finishLineNode)
+        label1 = UILabel(frame: CGRect(x: 0, y: 20, width: self.size.width, height: 10))
         label1.text = "250 meters"
         label1.backgroundColor = UIColor(displayP3Red: 0.1, green: 0.1, blue: 0.1, alpha: 0.5)
         label1.textAlignment = .center
@@ -247,18 +254,22 @@ class GameScene2: SKScene, SKPhysicsContactDelegate {
         label1.textColor = UIColor.yellow
         label1.font = UIFont.init(name: "Optima", size: 10)
         self.view?.addSubview(label1)
-         self.addChild(finishLineNode)
+
     }
     var startLineNode = SKNode()
     var startLine = SKSpriteNode()
     func addStartLine(){
         let startLineSz = CGSize(width: Int(self.size.width), height: 20)
+        startLine = SKSpriteNode(color: UIColor.init(red: 0, green: 0.5, blue: 0.5, alpha: 0.1), size: startLineSz)
         startLine.physicsBody = SKPhysicsBody(rectangleOf: startLineSz)
         startLine.position = CGPoint(x:self.size.width/2, y: 5)
         startLine.physicsBody?.isDynamic = false
-        startLine.color = UIColor(displayP3Red: 0, green: 0.5, blue: 0.3, alpha: 0.5)
+        startLine.zPosition = 4
+        startLine.color = .yellow
+        startLine.alpha = 0.2
         startLineNode.addChild(startLine)
         self.addChild(startLineNode)
+
     }
     var floatArray = [SKSpriteNode]()
 
@@ -345,14 +356,16 @@ class GameScene2: SKScene, SKPhysicsContactDelegate {
 
     func moveFloat(){
         for float in floatArray{
-            float.position = CGPoint(x: float.position.x, y: float.position.y - 2 )
+            let move1 = SKAction.move(by: (CGVector(dx: 0, dy:-5)), duration: 0.2)
+            float.run(move1)
+//            float.position = CGPoint(x: float.position.x, y: float.position.y - 1 )
             float.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
-            float.physicsBody?.applyImpulse(CGVector(dx: 0, dy: -0.04))
+            float.physicsBody?.applyImpulse(CGVector(dx: 0, dy: -0.03))
         }
         finishLine.position = CGPoint(x: finishLine.position.x, y: finishLine.position.y - 2 )
         finishLine.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
         finishLine.physicsBody?.applyImpulse(CGVector(dx: 0, dy: -0.04))
-        label1.center = CGPoint(x: frame.size.width/2, y: label1.frame.origin.y - 2 )
+        label1.center = CGPoint(x: frame.size.width/2, y: label1.frame.origin.y + 2 )
 
     }
 
