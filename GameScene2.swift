@@ -16,7 +16,7 @@ struct PhysicsCategory {
     static let floatPC : UInt32 = 0x1 << 3
 }
 
-class GameScene2: SKScene, SKPhysicsContactDelegate {
+class GameScene2: SKScene, SKPhysicsContactDelegate, UIScrollViewDelegate {
     var tapleft = UILabel()
     var right = UILabel()
     var seaImage = SKSpriteNode()
@@ -36,16 +36,36 @@ class GameScene2: SKScene, SKPhysicsContactDelegate {
     var rightButton = UIButton()
     var width = CGFloat()
     var height = CGFloat()
-
-
+    var scrollView = UIScrollView()
+    var scrollViewCont = UIViewController()
     override func didMove(to view: SKView) {
         getItTogether()
     }
+    func scrollViewDidZoom(_ scrollView: UIScrollView) {
+
+    }
+    func viewForZooming(in scrollView: UIScrollView) -> UIView? {
+        return scrollView
+    }
     func getItTogether(){
-        //  view.frame.size = CGSize(width: self.size.width*2, height: self.size.height*2)
-        // view.frame.origin = CGPoint(x:  self.size.width/2, y: -100)
-        width = self.size.width
-        height = self.size.height
+        timer.fire()
+        scrollView = UIScrollView(frame: (view?.bounds)!)
+        scrollView.delegate = self
+        scrollView.minimumZoomScale = 0.1
+        scrollView.maximumZoomScale = 4.0
+        scrollView.zoomScale = 2.0
+        scrollView.backgroundColor = UIColor.cyan
+        
+
+       // scrollViewCont.view?.addSubview(scrollView)
+       // let VC = self.view?.window?.rootViewController
+        //self.view?.window?.rootViewController = VC
+        //VC?.present(view!, animated: true, completion: nil)
+       //self.view?.window?.rootViewController = scrollViewCont
+
+
+       // width = self.size.width
+        //height = self.size.height
         self.physicsWorld.contactDelegate = self
         self.physicsWorld.gravity = CGVector( dx: 0.0, dy: -0.06 )
         //red background
@@ -60,6 +80,10 @@ class GameScene2: SKScene, SKPhysicsContactDelegate {
         let spin = SKAction.rotate(byAngle: 0.005, duration: 0.1)
         let sequence = SKAction.sequence([sizeUp, spin, sizeUp.reversed(), spin.reversed()])
         seaImage.run(SKAction.repeatForever(sequence), withKey: "moving")
+
+
+        //scrollView.
+
         self.addChild(seaImage)
         //add boat
         boatNode = SKNode()
@@ -95,13 +119,14 @@ class GameScene2: SKScene, SKPhysicsContactDelegate {
         right.font = UIFont.init(name: "Optima", size: 25)
         right.text = "Tap \n here \n 2 \n row \n right"
         self.view?.addSubview(right)
-    }
+
+        }
     override func update(_ currentTime: CFTimeInterval) {
         if gameStarted == true{
             boat.physicsBody?.affectedByGravity = true
-            countNum.removeFromSuperview()
             right.removeFromSuperview()
             tapleft.removeFromSuperview()
+            countNum.removeFromSuperview()
     //add left button
             leftButton = UIButton(type: UIButtonType.custom) as UIButton
             leftButton.frame = (frame: CGRect(x: 0 , y: 0 , width: self.size.width/2 , height: self.size.height))
@@ -129,6 +154,7 @@ class GameScene2: SKScene, SKPhysicsContactDelegate {
         if gameOver == true{
             boat.physicsBody?.affectedByGravity = false
         }
+
     }
 
      func didBegin(_ contact: SKPhysicsContact) {
@@ -154,10 +180,9 @@ class GameScene2: SKScene, SKPhysicsContactDelegate {
         countNum = UILabel(frame: CGRect(x: self.size.width/2 - 75, y: self.size.height/3 , width: 150, height: 40))
         countNum.textAlignment = .center
         countNum.textColor = UIColor.yellow
-        countNum.numberOfLines = 0
         countNum.font = UIFont.init(name: "Optima", size: 30)
         countNum.text = "\(countInt)"
-        if  countInt == 2{   ///////////*********change count to 4****** //////////
+        if  countInt == 4{   ///////////*********change count to 4****** //////////
             timer.invalidate()
             countNum.text = "Start"
             gameStarted = true
@@ -167,6 +192,7 @@ class GameScene2: SKScene, SKPhysicsContactDelegate {
         //ADD FLOAT1
             addFloat1()
             addStartLine()
+            countInt = 0
         }
         self.view?.addSubview(countNum)
     }
@@ -187,7 +213,9 @@ class GameScene2: SKScene, SKPhysicsContactDelegate {
         boat.texture = SKTexture(imageNamed:"boatLeft")
         boat.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
        // boat.position = CGPoint(x: boat.position.x - 2 , y: boat.position.y + 1)
-        boat.physicsBody?.applyImpulse(CGVector(dx: -0.05, dy: 0.05))
+        let moveLeft = SKAction.moveBy(x: -3 , y: 6, duration: 0.2)
+        boat.run(moveLeft)
+        boat.physicsBody?.applyImpulse(CGVector(dx: -0.05, dy: 0.08))
         timer2 = Timer.scheduledTimer(timeInterval: 0.2, target: self, selector: #selector(GameScene2.changePic), userInfo: nil, repeats: false)
         boatl = false
     }
@@ -199,9 +227,11 @@ class GameScene2: SKScene, SKPhysicsContactDelegate {
     {
         moveFloatLeft()
         boat.texture = SKTexture(imageNamed:"boatRight")
-        boat.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
+       boat.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
        // boat.position = CGPoint(x: boat.position.x + 2 , y: boat.position.y + 1)
-        boat.physicsBody?.applyImpulse(CGVector(dx: 0.05, dy: 0.05))
+        let moveRight = SKAction.moveBy(x: 3 , y: 6, duration: 0.2)
+        boat.run(moveRight)
+        boat.physicsBody?.applyImpulse(CGVector(dx: 0.05, dy: 0.1))
         timer3 = Timer.scheduledTimer(timeInterval: 0.2, target: self, selector: #selector(GameScene2.changePic), userInfo: nil, repeats: false)
          boatr = false
 
@@ -212,8 +242,10 @@ class GameScene2: SKScene, SKPhysicsContactDelegate {
         moveFloat()
         boat.texture = SKTexture(imageNamed:"boatForward")
         boat.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
-        boat.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 0.05))
-        boat.position = CGPoint(x: boat.position.x , y: boat.position.y + 3)
+        boat.position = CGPoint(x: boat.position.x , y: boat.position.y + 15)
+        let moveRight = SKAction.moveBy(x: 0 , y: 10, duration: 0.2)
+        boat.run(moveRight)
+        boat.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 0.1))
                 timer2 = Timer.scheduledTimer(timeInterval: 0.2, target: self, selector: #selector(GameScene2.changePic), userInfo: nil, repeats: false)
         boatr = false
         boatl = false
@@ -342,6 +374,7 @@ class GameScene2: SKScene, SKPhysicsContactDelegate {
         timing.text = "Your Complete Time \n \(completedTime!)"
         self.view?.addSubview(timing)
         addReplay()
+        secondsLeft = 0
     }
 
     var customView = UIView()
@@ -351,13 +384,13 @@ class GameScene2: SKScene, SKPhysicsContactDelegate {
         print("popupmethod")
 
        customView = UIView(frame: CGRect(x: 0, y: 0, width: 200 , height: 200))
-        customView.backgroundColor = UIColor.init(red: 196/255, green: 113/255, blue: 245/255, alpha: 1/255)
+        customView.backgroundColor = UIColor.init(red: 196/255, green: 113/255, blue: 245/255, alpha:1)
     //    customView.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
 //        customView.frame.size = CGSize(width: 100, height: 100)
 //        customView.frame.origin = CGPoint(x: 100, y: 100)
   //      addFloat1()
         //self.view?.addSubview(customView)
-        self.view?.addSubview(customView)
+      //  self.view?.addSubview(customView)
 
     }
 
@@ -420,16 +453,17 @@ class GameScene2: SKScene, SKPhysicsContactDelegate {
     func restartMethod(){
         print("restartme")
         self.removeAllChildren()
-        self.removeAllActions()
-        self.removeFromParent()
         rightButton.removeFromSuperview()
         timing.removeFromSuperview()
+        label1.removeFromSuperview()
+        replay.removeFromSuperview()
+        countNum.removeFromSuperview()
+        countDownlabel.removeFromSuperview()
+        timer.fire()
         gameOver = false
         started = false
         gameStarted = true
         getItTogether()
-
-
     }
 
 }
