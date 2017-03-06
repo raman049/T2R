@@ -14,6 +14,7 @@ struct PhysicsCategory {
     static let boatPC : UInt32 = 0x1 << 1
     static let finishLinePC : UInt32 = 0x1 << 2
     static let floatPC : UInt32 = 0x1 << 3
+     static let startLine : UInt32 = 0x1 << 3
 }
 
 class GameScene2: SKScene, SKPhysicsContactDelegate, UIScrollViewDelegate {
@@ -27,8 +28,6 @@ class GameScene2: SKScene, SKPhysicsContactDelegate, UIScrollViewDelegate {
     var finishLineNode = SKNode()
     var floatNode = SKNode()
     var float1 = SKSpriteNode()
-    var float2 = SKSpriteNode()
-    var float3 = SKSpriteNode()
     var started = Bool()
     var gameStarted = Bool()
     var gameOver = Bool()
@@ -44,18 +43,19 @@ class GameScene2: SKScene, SKPhysicsContactDelegate, UIScrollViewDelegate {
     func scrollViewDidZoom(_ scrollView: UIScrollView) {
 
     }
-    func viewForZooming(in scrollView: UIScrollView) -> UIView? {
-        return scrollView
-    }
+//    func viewForZooming(in scrollView: UIScrollView) -> UIView? {
+//        return scrollView
+//    }
     func getItTogether(){
         timer.fire()
         scrollView = UIScrollView(frame: (view?.bounds)!)
         scrollView.delegate = self
         scrollView.minimumZoomScale = 0.1
         scrollView.maximumZoomScale = 4.0
-        scrollView.zoomScale = 2.0
-        scrollView.backgroundColor = UIColor.cyan
-        
+        scrollView.zoomScale = 0.5
+       // scrollView.backgroundColor = UIColor.cyan
+        //self.view?.addSubview(scrollView)
+
 
        // scrollViewCont.view?.addSubview(scrollView)
        // let VC = self.view?.window?.rootViewController
@@ -69,7 +69,7 @@ class GameScene2: SKScene, SKPhysicsContactDelegate, UIScrollViewDelegate {
         self.physicsWorld.contactDelegate = self
         self.physicsWorld.gravity = CGVector( dx: 0.0, dy: -0.06 )
         //red background
-        backgroundColor = UIColor.init(red: 0, green: 1, blue: 1, alpha: 1.0)
+        backgroundColor = UIColor.init(red: 0, green: 0.5, blue: 145/255, alpha: 0.5)
         //add sea image
         seaImage = SKSpriteNode(imageNamed: "water")
         let seaImageSz = CGSize(width: self.size.width*2, height: self.size.height*2)
@@ -81,10 +81,9 @@ class GameScene2: SKScene, SKPhysicsContactDelegate, UIScrollViewDelegate {
         let sequence = SKAction.sequence([sizeUp, spin, sizeUp.reversed(), spin.reversed()])
         seaImage.run(SKAction.repeatForever(sequence), withKey: "moving")
 
-
         //scrollView.
 
-        self.addChild(seaImage)
+      //  self.addChild(seaImage)
         //add boat
         boatNode = SKNode()
         boat = SKSpriteNode(imageNamed: "boatSteady")
@@ -96,6 +95,7 @@ class GameScene2: SKScene, SKPhysicsContactDelegate, UIScrollViewDelegate {
         boat.physicsBody?.allowsRotation = false
         boat.physicsBody?.categoryBitMask = PhysicsCategory.boatPC
         boat.physicsBody?.collisionBitMask = 0
+        boat.physicsBody?.collisionBitMask = PhysicsCategory.startLine
         boat.physicsBody?.contactTestBitMask = PhysicsCategory.finishLinePC
         boat.scale(to: boat1ImageSz)
         boat.zPosition = 5
@@ -191,6 +191,7 @@ class GameScene2: SKScene, SKPhysicsContactDelegate, UIScrollViewDelegate {
             addFinishLine()
         //ADD FLOAT1
             addFloat1()
+            addWave()
             addStartLine()
             countInt = 0
         }
@@ -234,6 +235,15 @@ class GameScene2: SKScene, SKPhysicsContactDelegate, UIScrollViewDelegate {
         boat.physicsBody?.applyImpulse(CGVector(dx: 0.05, dy: 0.1))
         timer3 = Timer.scheduledTimer(timeInterval: 0.2, target: self, selector: #selector(GameScene2.changePic), userInfo: nil, repeats: false)
          boatr = false
+
+        scrollView = UIScrollView(frame: CGRect(x: 0, y: 20, width: self.size.width, height: 10))
+      //  scrollView.delegate = self
+        scrollView.minimumZoomScale = 0.1
+        scrollView.maximumZoomScale = 4.0
+        scrollView.zoomScale = 0.5
+        scrollView.backgroundColor = UIColor.cyan
+        self.view?.addSubview(scrollView)
+
 
     }
     func boatForward()
@@ -290,6 +300,8 @@ class GameScene2: SKScene, SKPhysicsContactDelegate, UIScrollViewDelegate {
         startLine.physicsBody = SKPhysicsBody(rectangleOf: startLineSz)
         startLine.position = CGPoint(x:self.size.width/2, y: 5)
         startLine.physicsBody?.isDynamic = false
+        startLine.physicsBody?.categoryBitMask = PhysicsCategory.startLine
+        startLine.physicsBody?.collisionBitMask = PhysicsCategory.boatPC
         startLine.zPosition = 4
         startLine.color = .yellow
         startLine.alpha = 0.2
@@ -302,7 +314,7 @@ class GameScene2: SKScene, SKPhysicsContactDelegate, UIScrollViewDelegate {
     func addFloat1(){
         for ii in 1...20 {
         for i in 1...2 {
-        floatNode = SKNode()
+       // floatNode = SKNode()
         float1 = SKSpriteNode(imageNamed: "float")
         let float1Sz = CGSize(width: float1.size.width/5, height: float1.size.height/5)
         float1.physicsBody = SKPhysicsBody(rectangleOf: float1Sz)
@@ -324,6 +336,45 @@ class GameScene2: SKScene, SKPhysicsContactDelegate, UIScrollViewDelegate {
     func implementAddFloat(){
         for float in floatArray{
             self.addChild(float)
+        }
+    }
+    var waveArray = [SKSpriteNode]()
+    var waveNode = SKNode()
+    var wave = SKSpriteNode()
+   func addWave(){
+        for ii in 0...25 {
+            for i in 1...7 {
+              //  waveNode = SKNode()
+                wave = SKSpriteNode( imageNamed: "wavea")
+                let waveHt = wave.size.height
+                let wavearray = [SKSpriteNode (imageNamed: "wavea"),SKSpriteNode (imageNamed: "waveb"),SKSpriteNode (imageNamed: "wavec"),SKSpriteNode (imageNamed: "waved") ]
+                var j = 0
+                for waveA in wavearray{
+                    j = j + 1
+                     wave = waveA
+                    let waveSz = CGSize(width: wave.size.width, height: wave.size.height)
+                            wave.scale(to: waveSz)
+                    wave.zPosition = 1
+                    wave.alpha = 1
+                    let rNum =  Int(arc4random_uniform(UInt32(30)))
+                    let rNum2 = Int(arc4random_uniform(UInt32(30)))
+                    let rNum3 = CGFloat(arc4random_uniform(UInt32(9)))/100
+                    let rNum4 = Int(arc4random_uniform(UInt32(3)))
+                    wave.position = CGPoint(x: 10 * (100*i) , y: 60 * ii + (10*j))
+                    let action1 = SKAction.rotate(byAngle: (CGFloat)(rNum3), duration: 1)
+                    let action2 = SKAction.rotate(byAngle: -(CGFloat)(rNum3), duration: 1)
+                    let sequence2 = SKAction.sequence([action1, action1.reversed(),action2,action2.reversed()])
+                    wave.run(SKAction.repeatForever(sequence2))
+                    waveArray.append(wave)
+                }
+           }
+        }
+        implementAddWave()
+    }
+
+    func implementAddWave(){
+        for wave in waveArray{
+            self.addChild(wave)
         }
     }
 
@@ -402,6 +453,13 @@ class GameScene2: SKScene, SKPhysicsContactDelegate, UIScrollViewDelegate {
             float.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
             float.physicsBody?.applyImpulse(CGVector(dx: 0, dy: -0.03))
         }
+        for wave in waveArray{
+            let move1 = SKAction.move(by: (CGVector(dx: 0 , dy:-5)), duration: 0.2)
+            wave.run(move1)
+            //            float.position = CGPoint(x: float.position.x, y: float.position.y - 1 )
+            wave.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
+            wave.physicsBody?.applyImpulse(CGVector(dx: 0, dy: -0.03))
+        }
         finishLine.position = CGPoint(x: finishLine.position.x, y: finishLine.position.y - 2 )
         finishLine.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
         finishLine.physicsBody?.applyImpulse(CGVector(dx: 0, dy: -0.04))
@@ -417,6 +475,13 @@ class GameScene2: SKScene, SKPhysicsContactDelegate, UIScrollViewDelegate {
             float.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
             float.physicsBody?.applyImpulse(CGVector(dx: 0.03, dy: -0.03))
         }
+        for wave in waveArray{
+            let move1 = SKAction.move(by: (CGVector(dx: 1 , dy:-5)), duration: 0.2)
+            wave.run(move1)
+            //            float.position = CGPoint(x: float.position.x, y: float.position.y - 1 )
+            wave.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
+            wave.physicsBody?.applyImpulse(CGVector(dx: 0.03, dy: -0.03))
+        }
         finishLine.position = CGPoint(x: finishLine.position.x, y: finishLine.position.y - 2 )
         finishLine.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
         finishLine.physicsBody?.applyImpulse(CGVector(dx: 0, dy: -0.04))
@@ -431,6 +496,14 @@ class GameScene2: SKScene, SKPhysicsContactDelegate, UIScrollViewDelegate {
             float.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
             float.physicsBody?.applyImpulse(CGVector(dx: -0.03, dy: -0.03))
         }
+        for wave in waveArray{
+            let move1 = SKAction.move(by: (CGVector(dx: -1 , dy:-5)), duration: 0.2)
+            wave.run(move1)
+            //            float.position = CGPoint(x: float.position.x, y: float.position.y - 1 )
+            wave.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
+            wave.physicsBody?.applyImpulse(CGVector(dx: -0.03, dy: -0.03))
+        }
+
         finishLine.position = CGPoint(x: finishLine.position.x, y: finishLine.position.y - 2 )
         finishLine.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
         finishLine.physicsBody?.applyImpulse(CGVector(dx: 0, dy: -0.04))
