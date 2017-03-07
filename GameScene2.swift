@@ -47,80 +47,23 @@ class GameScene2: SKScene, SKPhysicsContactDelegate, UIScrollViewDelegate {
 //        return scrollView
 //    }
     func getItTogether(){
-        timer.fire()
+        //timer.fire()
         scrollView = UIScrollView(frame: (view?.bounds)!)
         scrollView.delegate = self
         scrollView.minimumZoomScale = 0.1
         scrollView.maximumZoomScale = 4.0
         scrollView.zoomScale = 0.5
-       // scrollView.backgroundColor = UIColor.cyan
-        //self.view?.addSubview(scrollView)
-
-
-       // scrollViewCont.view?.addSubview(scrollView)
-       // let VC = self.view?.window?.rootViewController
-        //self.view?.window?.rootViewController = VC
-        //VC?.present(view!, animated: true, completion: nil)
-       //self.view?.window?.rootViewController = scrollViewCont
-
-
-       // width = self.size.width
-        //height = self.size.height
         self.physicsWorld.contactDelegate = self
-        self.physicsWorld.gravity = CGVector( dx: 0.0, dy: -0.06 )
+        self.physicsWorld.gravity = CGVector( dx: 0.0, dy: -0.03 )
         //red background
-        backgroundColor = UIColor.init(red: 0, green: 0.5, blue: 145/255, alpha: 0.5)
-        //add sea image
-        seaImage = SKSpriteNode(imageNamed: "water")
-        let seaImageSz = CGSize(width: self.size.width*2, height: self.size.height*2)
-        seaImage.scale(to: seaImageSz)
-        seaImage.zPosition = 1
-        seaImage.position = CGPoint(x: self.size.width/2, y: self.size.height/2)
-        let sizeUp = SKAction.scale(by: 1.01 , duration: 0.3)
-        let spin = SKAction.rotate(byAngle: 0.005, duration: 0.1)
-        let sequence = SKAction.sequence([sizeUp, spin, sizeUp.reversed(), spin.reversed()])
-        seaImage.run(SKAction.repeatForever(sequence), withKey: "moving")
-
-        //scrollView.
-
-      //  self.addChild(seaImage)
-        //add boat
-        boatNode = SKNode()
-        boat = SKSpriteNode(imageNamed: "boatSteady")
-        let boat1ImageSz = CGSize(width: boat.size.width/4, height: boat.size.height/4)
-        let boat1PhyBodySz = CGSize(width: boat.size.width/6, height: boat.size.height/3)
-        boat.physicsBody = SKPhysicsBody(rectangleOf: boat1PhyBodySz)
-        boat.physicsBody?.isDynamic = true
-        boat.physicsBody?.affectedByGravity = false
-        boat.physicsBody?.allowsRotation = false
-        boat.physicsBody?.categoryBitMask = PhysicsCategory.boatPC
-        boat.physicsBody?.collisionBitMask = 0
-        boat.physicsBody?.collisionBitMask = PhysicsCategory.startLine
-        boat.physicsBody?.contactTestBitMask = PhysicsCategory.finishLinePC
-        boat.scale(to: boat1ImageSz)
-        boat.zPosition = 5
-        boat.position = CGPoint(x: self.size.width/2, y: self.size.height/5)
-        boatNode.addChild(boat)
-        self.addChild(boatNode)
-
-        //left tap to row left
-        tapleft = UILabel(frame: CGRect(x: self.size.width/20, y: self.size.height/2 + self.size.height/5, width: 100, height: 150))
-        tapleft.textAlignment = .center
-        tapleft.textColor = UIColor.yellow
-        tapleft.numberOfLines = 0
-        tapleft.font = UIFont.init(name: "Optima", size: 25)
-        tapleft.text = "Tap \n here \n 2 \n row \n left"
-        self.view?.addSubview(tapleft)
-        //left tap to row right
-        right = UILabel(frame: CGRect(x: self.size.width - self.size.width/3, y: self.size.height/2 + self.size.height/5, width: 100, height: 150))
-        right.textAlignment = .center
-        right.textColor = UIColor.yellow
-        right.numberOfLines = 0
-        right.font = UIFont.init(name: "Optima", size: 25)
-        right.text = "Tap \n here \n 2 \n row \n right"
-        self.view?.addSubview(right)
-
-        }
+        backgroundColor = UIColor.init(red: 104/255, green: 1, blue: 13/255, alpha: 0.5)
+        addTextRL()
+        addBoat()
+        addFinishLine()
+        addFloat1()
+        addWave()
+        addStartLine()
+    }
     override func update(_ currentTime: CFTimeInterval) {
         if gameStarted == true{
             boat.physicsBody?.affectedByGravity = true
@@ -186,16 +129,49 @@ class GameScene2: SKScene, SKPhysicsContactDelegate, UIScrollViewDelegate {
             timer.invalidate()
             countNum.text = "Start"
             gameStarted = true
-            popUp()
-        //ADD FINISH LINE
-            addFinishLine()
-        //ADD FLOAT1
-            addFloat1()
-            addWave()
-            addStartLine()
             countInt = 0
         }
         self.view?.addSubview(countNum)
+    }
+    //add boat
+    func addBoat(){
+    boatNode.removeFromParent()
+    boat.removeFromParent()
+    boat = SKSpriteNode(imageNamed: "boatSteady")
+    let boat1ImageSz = CGSize(width: boat.size.width/4, height: boat.size.height/4)
+    let boat1PhyBodySz = CGSize(width: boat.size.width/6, height: boat.size.height/3)
+    boat.physicsBody = SKPhysicsBody(rectangleOf: boat1PhyBodySz)
+    boat.physicsBody?.isDynamic = true
+    boat.physicsBody?.affectedByGravity = false
+    boat.physicsBody?.allowsRotation = false
+    boat.physicsBody?.categoryBitMask = PhysicsCategory.boatPC
+    boat.physicsBody?.collisionBitMask = 0
+    boat.physicsBody?.collisionBitMask = PhysicsCategory.startLine
+    boat.physicsBody?.contactTestBitMask = PhysicsCategory.finishLinePC
+    boat.scale(to: boat1ImageSz)
+    boat.zPosition = 5
+    boat.position = CGPoint(x: self.size.width/2, y: self.size.height/5)
+    boatNode.addChild(boat)
+    self.addChild(boatNode)
+    }
+    func addTextRL(){
+        tapleft.removeFromSuperview()
+        tapleft = UILabel(frame: CGRect(x: self.size.width/20, y: self.size.height/2 + self.size.height/5, width: 100, height: 150))
+        tapleft.textAlignment = .center
+        tapleft.textColor = UIColor.yellow
+        tapleft.numberOfLines = 0
+        tapleft.font = UIFont.init(name: "Optima", size: 25)
+        tapleft.text = "Tap \n here \n 2 \n row \n left"
+        self.view?.addSubview(tapleft)
+        //left tap to row right
+        right.removeFromSuperview()
+        right = UILabel(frame: CGRect(x: self.size.width - self.size.width/3, y: self.size.height/2 + self.size.height/5, width: 100, height: 150))
+        right.textAlignment = .center
+        right.textColor = UIColor.yellow
+        right.numberOfLines = 0
+        right.font = UIFont.init(name: "Optima", size: 25)
+        right.text = "Tap \n here \n 2 \n row \n right"
+        self.view?.addSubview(right)
     }
 
     var timer2 = Timer()
@@ -248,7 +224,7 @@ class GameScene2: SKScene, SKPhysicsContactDelegate, UIScrollViewDelegate {
     }
     func boatForward()
     {
-         print("forward")
+         //print("forward")
         moveFloat()
         boat.texture = SKTexture(imageNamed:"boatForward")
         boat.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
@@ -266,7 +242,8 @@ class GameScene2: SKScene, SKPhysicsContactDelegate, UIScrollViewDelegate {
     }
     var label1 = UILabel()
     func addFinishLine(){
-        finishLineNode = SKNode()
+        finishLineNode.removeFromParent()
+        finishLine.removeFromParent()
         let fihishLineSz = CGSize(width: Int(self.size.width), height: 10)
         finishLine = SKSpriteNode(color: UIColor.init(red: 0.01, green: 0.8, blue: 0.0, alpha: 0.9), size: fihishLineSz)
         finishLine.physicsBody = SKPhysicsBody(rectangleOf: fihishLineSz)
@@ -281,7 +258,7 @@ class GameScene2: SKScene, SKPhysicsContactDelegate, UIScrollViewDelegate {
         finishLine.zPosition = 4
         finishLineNode.addChild(finishLine)
         self.addChild(finishLineNode)
-
+        label1.removeFromSuperview()
         label1 = UILabel(frame: CGRect(x: 0, y: 20, width: self.size.width, height: 10))
         label1.text = "250 meters"
         label1.backgroundColor = UIColor(displayP3Red: 0.1, green: 0.1, blue: 0.1, alpha: 0.5)
@@ -295,6 +272,8 @@ class GameScene2: SKScene, SKPhysicsContactDelegate, UIScrollViewDelegate {
     var startLineNode = SKNode()
     var startLine = SKSpriteNode()
     func addStartLine(){
+        startLine.removeFromParent()
+        startLineNode.removeAllChildren()
         let startLineSz = CGSize(width: Int(self.size.width), height: 20)
         startLine = SKSpriteNode(color: UIColor.init(red: 0, green: 0.5, blue: 0.5, alpha: 0.1), size: startLineSz)
         startLine.physicsBody = SKPhysicsBody(rectangleOf: startLineSz)
@@ -310,11 +289,12 @@ class GameScene2: SKScene, SKPhysicsContactDelegate, UIScrollViewDelegate {
 
     }
     var floatArray = [SKSpriteNode]()
-
+    var floatArrayNode = [SKNode]()
     func addFloat1(){
         for ii in 1...20 {
         for i in 1...2 {
-       // floatNode = SKNode()
+        floatNode = SKNode()
+        float1.removeFromParent()
         float1 = SKSpriteNode(imageNamed: "float")
         let float1Sz = CGSize(width: float1.size.width/5, height: float1.size.height/5)
         float1.physicsBody = SKPhysicsBody(rectangleOf: float1Sz)
@@ -329,53 +309,64 @@ class GameScene2: SKScene, SKPhysicsContactDelegate, UIScrollViewDelegate {
         let sequence2 = SKAction.sequence([action1, action1.reversed(),action2,action2.reversed()])
         float1.run(SKAction.repeatForever(sequence2))
         floatArray.append(float1)
+        floatNode.addChild(float1)
+        floatArrayNode.append(floatNode)
+
         }
         }
         implementAddFloat()
     }
     func implementAddFloat(){
-        for float in floatArray{
+        for float in floatArrayNode{
             self.addChild(float)
         }
+         floatArrayNode.removeAll()
+        floatArray.removeAll()
     }
     var waveArray = [SKSpriteNode]()
-    var waveNode = SKNode()
+    var waveArrayNode = [SKNode]()
     var wave = SKSpriteNode()
+    var waveNode = SKNode()
+
    func addWave(){
-        for ii in 0...25 {
-            for i in 1...7 {
-              //  waveNode = SKNode()
-                wave = SKSpriteNode( imageNamed: "wavea")
-                let waveHt = wave.size.height
-                let wavearray = [SKSpriteNode (imageNamed: "wavea"),SKSpriteNode (imageNamed: "waveb"),SKSpriteNode (imageNamed: "wavec"),SKSpriteNode (imageNamed: "waved") ]
+        for ii in 0...200 {
+            for i in 0...7 {
+                waveNode = SKNode()
+                let wavearray = [SKSpriteNode (imageNamed: "wavec"),SKSpriteNode (imageNamed: "wavea")]
                 var j = 0
                 for waveA in wavearray{
                     j = j + 1
                      wave = waveA
-                    let waveSz = CGSize(width: wave.size.width, height: wave.size.height)
-                            wave.scale(to: waveSz)
+                    let waveSz = CGSize(width: wave.size.width/3, height: wave.size.height/6)
+                    wave.scale(to: waveSz)
                     wave.zPosition = 1
                     wave.alpha = 1
-                    let rNum =  Int(arc4random_uniform(UInt32(30)))
-                    let rNum2 = Int(arc4random_uniform(UInt32(30)))
-                    let rNum3 = CGFloat(arc4random_uniform(UInt32(9)))/100
-                    let rNum4 = Int(arc4random_uniform(UInt32(3)))
-                    wave.position = CGPoint(x: 10 * (100*i) , y: 60 * ii + (10*j))
-                    let action1 = SKAction.rotate(byAngle: (CGFloat)(rNum3), duration: 1)
-                    let action2 = SKAction.rotate(byAngle: -(CGFloat)(rNum3), duration: 1)
+                    let rNum =  Int(arc4random_uniform(UInt32(150)))
+                    let rNum2 = Int(arc4random_uniform(UInt32(150)))
+                    let rNum3 = CGFloat(arc4random_uniform(UInt32(9)))
+                    wave.position = CGPoint(x:(100*i) + rNum , y: 5 * ii + (7*j) + rNum2 - 100)
+                    let action1 = SKAction.rotate(byAngle: (CGFloat)(rNum3)/100, duration: 1)
+                    let action2 = SKAction.rotate(byAngle: -(CGFloat)(rNum3)/100, duration: 0.8)
                     let sequence2 = SKAction.sequence([action1, action1.reversed(),action2,action2.reversed()])
                     wave.run(SKAction.repeatForever(sequence2))
+                    let action3 = SKAction.moveBy(x: 0, y: 5, duration: 1)
+                    let sequence3 = SKAction.sequence([action3,action3.reversed()])
+                    wave.run(SKAction.repeatForever(sequence3))
                     waveArray.append(wave)
+                    waveNode.addChild(wave)
                 }
-           }
+                waveArrayNode.append(waveNode)
+            }
         }
         implementAddWave()
     }
 
     func implementAddWave(){
-        for wave in waveArray{
+        for wave in waveArrayNode{
             self.addChild(wave)
         }
+        waveArrayNode.removeAll()
+        waveArray.removeAll()
     }
 
     var copyOfView = UIViewController()
@@ -425,7 +416,7 @@ class GameScene2: SKScene, SKPhysicsContactDelegate, UIScrollViewDelegate {
         timing.text = "Your Complete Time \n \(completedTime!)"
         self.view?.addSubview(timing)
         addReplay()
-        secondsLeft = 0
+        //secondsLeft = 0
     }
 
     var customView = UIView()
@@ -526,13 +517,16 @@ class GameScene2: SKScene, SKPhysicsContactDelegate, UIScrollViewDelegate {
     func restartMethod(){
         print("restartme")
         self.removeAllChildren()
+        self.removeAllActions()
+        self.removeFromParent()
+        floatArrayNode.removeAll()
+        waveArrayNode.removeAll()
         rightButton.removeFromSuperview()
         timing.removeFromSuperview()
         label1.removeFromSuperview()
         replay.removeFromSuperview()
         countNum.removeFromSuperview()
         countDownlabel.removeFromSuperview()
-        timer.fire()
         gameOver = false
         started = false
         gameStarted = true
