@@ -53,16 +53,24 @@ class GameScene2: SKScene, SKPhysicsContactDelegate, UIScrollViewDelegate {
         scrollView.minimumZoomScale = 0.1
         scrollView.maximumZoomScale = 4.0
         scrollView.zoomScale = 0.5
+       // scrollView.backgroundColor = UIColor.cyan
+        //self.view?.addSubview(scrollView
+       // scrollViewCont.view?.addSubview(scrollView)
+       // let VC = self.view?.window?.rootViewController
+        //self.view?.window?.rootViewController = VC
+        //VC?.present(view!, animated: true, completion: nil)
+       //self.view?.window?.rootViewController = scrollViewCont
         self.physicsWorld.contactDelegate = self
         self.physicsWorld.gravity = CGVector( dx: 0.0, dy: -0.03 )
         //red background
         backgroundColor = UIColor.init(red: 104/255, green: 1, blue: 13/255, alpha: 0.5)
-        addTextRL()
+
         addBoat()
         addFinishLine()
         addFloat1()
         addWave()
         addStartLine()
+        addTextRL()
     }
     override func update(_ currentTime: CFTimeInterval) {
         if gameStarted == true{
@@ -135,8 +143,7 @@ class GameScene2: SKScene, SKPhysicsContactDelegate, UIScrollViewDelegate {
     }
     //add boat
     func addBoat(){
-    boatNode.removeFromParent()
-    boat.removeFromParent()
+    boatNode = SKNode()
     boat = SKSpriteNode(imageNamed: "boatSteady")
     let boat1ImageSz = CGSize(width: boat.size.width/4, height: boat.size.height/4)
     let boat1PhyBodySz = CGSize(width: boat.size.width/6, height: boat.size.height/3)
@@ -155,7 +162,6 @@ class GameScene2: SKScene, SKPhysicsContactDelegate, UIScrollViewDelegate {
     self.addChild(boatNode)
     }
     func addTextRL(){
-        tapleft.removeFromSuperview()
         tapleft = UILabel(frame: CGRect(x: self.size.width/20, y: self.size.height/2 + self.size.height/5, width: 100, height: 150))
         tapleft.textAlignment = .center
         tapleft.textColor = UIColor.yellow
@@ -164,7 +170,6 @@ class GameScene2: SKScene, SKPhysicsContactDelegate, UIScrollViewDelegate {
         tapleft.text = "Tap \n here \n 2 \n row \n left"
         self.view?.addSubview(tapleft)
         //left tap to row right
-        right.removeFromSuperview()
         right = UILabel(frame: CGRect(x: self.size.width - self.size.width/3, y: self.size.height/2 + self.size.height/5, width: 100, height: 150))
         right.textAlignment = .center
         right.textColor = UIColor.yellow
@@ -224,7 +229,7 @@ class GameScene2: SKScene, SKPhysicsContactDelegate, UIScrollViewDelegate {
     }
     func boatForward()
     {
-         //print("forward")
+         print("forward")
         moveFloat()
         boat.texture = SKTexture(imageNamed:"boatForward")
         boat.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
@@ -242,8 +247,7 @@ class GameScene2: SKScene, SKPhysicsContactDelegate, UIScrollViewDelegate {
     }
     var label1 = UILabel()
     func addFinishLine(){
-        finishLineNode.removeFromParent()
-        finishLine.removeFromParent()
+        finishLineNode = SKNode()
         let fihishLineSz = CGSize(width: Int(self.size.width), height: 10)
         finishLine = SKSpriteNode(color: UIColor.init(red: 0.01, green: 0.8, blue: 0.0, alpha: 0.9), size: fihishLineSz)
         finishLine.physicsBody = SKPhysicsBody(rectangleOf: fihishLineSz)
@@ -258,7 +262,7 @@ class GameScene2: SKScene, SKPhysicsContactDelegate, UIScrollViewDelegate {
         finishLine.zPosition = 4
         finishLineNode.addChild(finishLine)
         self.addChild(finishLineNode)
-        label1.removeFromSuperview()
+
         label1 = UILabel(frame: CGRect(x: 0, y: 20, width: self.size.width, height: 10))
         label1.text = "250 meters"
         label1.backgroundColor = UIColor(displayP3Red: 0.1, green: 0.1, blue: 0.1, alpha: 0.5)
@@ -272,8 +276,6 @@ class GameScene2: SKScene, SKPhysicsContactDelegate, UIScrollViewDelegate {
     var startLineNode = SKNode()
     var startLine = SKSpriteNode()
     func addStartLine(){
-        startLine.removeFromParent()
-        startLineNode.removeAllChildren()
         let startLineSz = CGSize(width: Int(self.size.width), height: 20)
         startLine = SKSpriteNode(color: UIColor.init(red: 0, green: 0.5, blue: 0.5, alpha: 0.1), size: startLineSz)
         startLine.physicsBody = SKPhysicsBody(rectangleOf: startLineSz)
@@ -294,7 +296,6 @@ class GameScene2: SKScene, SKPhysicsContactDelegate, UIScrollViewDelegate {
         for ii in 1...20 {
         for i in 1...2 {
         floatNode = SKNode()
-        float1.removeFromParent()
         float1 = SKSpriteNode(imageNamed: "float")
         let float1Sz = CGSize(width: float1.size.width/5, height: float1.size.height/5)
         float1.physicsBody = SKPhysicsBody(rectangleOf: float1Sz)
@@ -320,8 +321,7 @@ class GameScene2: SKScene, SKPhysicsContactDelegate, UIScrollViewDelegate {
         for float in floatArrayNode{
             self.addChild(float)
         }
-         floatArrayNode.removeAll()
-        floatArray.removeAll()
+
     }
     var waveArray = [SKSpriteNode]()
     var waveArrayNode = [SKNode]()
@@ -332,6 +332,8 @@ class GameScene2: SKScene, SKPhysicsContactDelegate, UIScrollViewDelegate {
         for ii in 0...200 {
             for i in 0...7 {
                 waveNode = SKNode()
+               //wave = SKSpriteNode( imageNamed: "wavea")
+               // let waveHt = wave.size.height
                 let wavearray = [SKSpriteNode (imageNamed: "wavec"),SKSpriteNode (imageNamed: "wavea")]
                 var j = 0
                 for waveA in wavearray{
@@ -365,8 +367,6 @@ class GameScene2: SKScene, SKPhysicsContactDelegate, UIScrollViewDelegate {
         for wave in waveArrayNode{
             self.addChild(wave)
         }
-        waveArrayNode.removeAll()
-        waveArray.removeAll()
     }
 
     var copyOfView = UIViewController()
@@ -521,6 +521,8 @@ class GameScene2: SKScene, SKPhysicsContactDelegate, UIScrollViewDelegate {
         self.removeFromParent()
         floatArrayNode.removeAll()
         waveArrayNode.removeAll()
+        floatArray.removeAll()
+        waveArray.removeAll()
         rightButton.removeFromSuperview()
         timing.removeFromSuperview()
         label1.removeFromSuperview()
